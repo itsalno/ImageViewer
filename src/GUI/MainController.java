@@ -12,6 +12,8 @@ import javafx.stage.FileChooser;
 import java.io.File;
 import java.net.URI;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.ResourceBundle;
 
@@ -25,6 +27,8 @@ public class MainController implements Initializable {
     @FXML
     private Label imgname;
 
+    private List<Image> images = new ArrayList<>();
+
     public void loadImage(ActionEvent actionEvent) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Select Image");
@@ -37,6 +41,8 @@ public class MainController implements Initializable {
 
             Image image = new Image(file.toURI().toString());
             imagePlace.setImage(image);
+
+            images.add(image);
         }
     }
 
