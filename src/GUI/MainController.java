@@ -50,4 +50,13 @@ public class MainController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
 
     }
+    @FXML
+    public void showNextImage(ActionEvent actionEvent) {
+        if (!images.isEmpty()) {
+            int currentIndex = images.indexOf(imagePlace.getImage());
+            int nextIndex = (currentIndex + 1) % images.size();
+            Image nextImage = images.get(nextIndex);
+            imagePlace.setImage(nextImage);
+        }
+    }
 }
