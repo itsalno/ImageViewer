@@ -18,8 +18,8 @@ import java.util.Random;
 import java.util.ResourceBundle;
 
 public class MainController implements Initializable {
-
-    public ImageView imagePlace;
+    @FXML
+    private ImageView imagePlace;
     @FXML
     private Button Prev;
     @FXML
