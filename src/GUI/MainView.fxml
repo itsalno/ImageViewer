@@ -22,7 +22,7 @@
          <image>
             <Image url="@../../../Screenshot%202024-03-15%20at%2009.58.38.png" />
          </image></ImageView>
-      <Button fx:id="Prev" layoutX="10.0" layoutY="202.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="53.0" styleClass="prev-button" stylesheets="@Style.css" text="Prev" />
+      <Button fx:id="Prev" layoutX="10.0" layoutY="202.0" mnemonicParsing="false" onAction="#showPreviousImage" prefHeight="30.0" prefWidth="53.0" styleClass="prev-button" stylesheets="@Style.css" text="Prev" />
       <Button fx:id="nextBtn" layoutX="545.0" layoutY="202.0" mnemonicParsing="false" onAction="#showNextImage" prefHeight="30.0" prefWidth="53.0" styleClass="next-button" stylesheets="@Style.css" text="Next" />
    </children>
 </AnchorPane>

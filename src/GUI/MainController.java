@@ -59,4 +59,14 @@ public class MainController implements Initializable {
             imagePlace.setImage(nextImage);
         }
     }
+
+    @FXML
+    public void showPreviousImage(ActionEvent actionEvent) {
+        if (!images.isEmpty()) {
+            int currentIndex = images.indexOf(imagePlace.getImage());
+            int previousIndex = (currentIndex - 1 + images.size()) % images.size();
+            Image previousImage = images.get(previousIndex);
+            imagePlace.setImage(previousImage);
+        }
+    }
 }
