@@ -29,6 +29,8 @@ public class MainController implements Initializable {
 
     private List<Image> images = new ArrayList<>();
 
+
+    //Loads the image to the imageview
     public void loadImage(ActionEvent actionEvent) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Select Image");
@@ -46,10 +48,13 @@ public class MainController implements Initializable {
         }
     }
 
+    //When FXML file is loaded starts the slideshow.
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
+        startSlideshow();
     }
+
+    //When the button is clicked,swithes image for next loaded.
     @FXML
     public void showNextImage(ActionEvent actionEvent) {
         if (!images.isEmpty()) {
@@ -60,6 +65,7 @@ public class MainController implements Initializable {
         }
     }
 
+    //When the button is clicked,swithes image for previosly loaded.
     @FXML
     public void showPreviousImage(ActionEvent actionEvent) {
         if (!images.isEmpty()) {
@@ -68,5 +74,10 @@ public class MainController implements Initializable {
             Image previousImage = images.get(previousIndex);
             imagePlace.setImage(previousImage);
         }
+    }
+
+    //Logic for starting the slideshow.
+    public void startSlideshow(){
+
     }
 }
