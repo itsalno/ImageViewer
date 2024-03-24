@@ -18,11 +18,13 @@
             <Label fx:id="imgname" layoutX="14.0" layoutY="14.0" prefHeight="26.0" prefWidth="239.0" style="-fx-border-color: grey; -fx-border-radius: 50; -fx-border-width: 2;" />
          </children>
       </AnchorPane>
-      <ImageView fx:id="imagePlace" fitHeight="319.0" fitWidth="482.0" layoutX="63.0" layoutY="58.0" pickOnBounds="true" preserveRatio="true">
+      <ImageView fx:id="imagePlace" fitHeight="295.0" fitWidth="482.0" layoutX="66.0" layoutY="53.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../../../Screenshot%202024-03-15%20at%2009.58.38.png" />
          </image></ImageView>
       <Button fx:id="Prev" layoutX="10.0" layoutY="202.0" mnemonicParsing="false" onAction="#showPreviousImage" prefHeight="30.0" prefWidth="53.0" styleClass="prev-button" stylesheets="@Style.css" text="Prev" />
       <Button fx:id="nextBtn" layoutX="545.0" layoutY="202.0" mnemonicParsing="false" onAction="#showNextImage" prefHeight="30.0" prefWidth="53.0" styleClass="next-button" stylesheets="@Style.css" text="Next" />
+      <Button layoutX="10.0" layoutY="352.0" mnemonicParsing="false" onAction="#startSlideshow" prefHeight="42.0" prefWidth="79.0" stylesheets="@Style.css" text="Start" />
+      <Button layoutX="98.0" layoutY="352.0" mnemonicParsing="false" onAction="#stopSlideshow" stylesheets="@Style.css" text="Stop" />
    </children>
 </AnchorPane>

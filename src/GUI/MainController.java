@@ -1,13 +1,17 @@
 package GUI;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
+import javafx.util.Duration;
 
 import java.io.File;
 import java.net.URI;
@@ -17,7 +21,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.ResourceBundle;
 
-public class MainController implements Initializable {
+public class MainController  {
     @FXML
     private ImageView imagePlace;
     @FXML
@@ -28,6 +32,8 @@ public class MainController implements Initializable {
     private Label imgname;
 
     private List<Image> images = new ArrayList<>();
+    private Timeline slideshowTimeline;
+    private int currentIndex = 0;
 
 
     //Loads the image to the imageview
@@ -38,21 +44,16 @@ public class MainController implements Initializable {
         FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.gif");
         fileChooser.getExtensionFilters().add(extFilter);
 
-        File file = fileChooser.showOpenDialog(null);
-        if (file != null) {
-
-            Image image = new Image(file.toURI().toString());
-            imagePlace.setImage(image);
-
-            images.add(image);
+        List<File> selectedFiles = fileChooser.showOpenMultipleDialog(null);
+        if (selectedFiles != null && !selectedFiles.isEmpty()) {
+            for (File file : selectedFiles) {
+                Image image = new Image(file.toURI().toString());
+                images.add(image);
+                imagePlace.setImage(image);
+            }
         }
     }
 
-    //When FXML file is loaded starts the slideshow.
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
-        startSlideshow();
-    }
 
     //When the button is clicked,swithes image for next loaded.
     @FXML
@@ -78,6 +79,34 @@ public class MainController implements Initializable {
 
     //Logic for starting the slideshow.
     public void startSlideshow(){
+        if (images.isEmpty()) {
+            errorNoImages("No images loaded for slideshow.");
+            return;
+        }
 
+        stopSlideshow();
+
+        slideshowTimeline = new Timeline(new KeyFrame(Duration.seconds(2), event -> {
+            currentIndex = (currentIndex + 1) % images.size();
+            Image nextImage = images.get(currentIndex);
+            imagePlace.setImage(nextImage);
+        }));
+        slideshowTimeline.setCycleCount(Timeline.INDEFINITE);
+        slideshowTimeline.play();
+    }
+
+    public void stopSlideshow() {
+        if (slideshowTimeline != null) {
+            slideshowTimeline.stop();
+            slideshowTimeline = null;
+        }
+    }
+
+    private void errorNoImages(String errorMessage) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("No image loaded");
+        alert.setHeaderText(null);
+        alert.setContentText(errorMessage);
+        alert.showAndWait();
     }
 }
