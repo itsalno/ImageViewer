@@ -50,6 +50,8 @@ public class MainController  {
                 Image image = new Image(file.toURI().toString());
                 images.add(image);
                 imagePlace.setImage(image);
+                String name= file.getName();
+                imgname.setText(name);
             }
         }
     }
@@ -63,6 +65,8 @@ public class MainController  {
             int nextIndex = (currentIndex + 1) % images.size();
             Image nextImage = images.get(nextIndex);
             imagePlace.setImage(nextImage);
+            String name=nextImage.getUrl().substring(nextImage.getUrl().lastIndexOf("/")+1, nextImage.getUrl().length());
+            imgname.setText(name);
         }
     }
 
@@ -74,6 +78,8 @@ public class MainController  {
             int previousIndex = (currentIndex - 1 + images.size()) % images.size();
             Image previousImage = images.get(previousIndex);
             imagePlace.setImage(previousImage);
+            String name=previousImage.getUrl().substring(previousImage.getUrl().lastIndexOf("/")+1, previousImage.getUrl().length());
+            imgname.setText(name);
         }
     }
 
@@ -90,6 +96,8 @@ public class MainController  {
             currentIndex = (currentIndex + 1) % images.size();
             Image nextImage = images.get(currentIndex);
             imagePlace.setImage(nextImage);
+            String name=nextImage.getUrl().substring(nextImage.getUrl().lastIndexOf("/")+1, nextImage.getUrl().length());
+            imgname.setText(name);
         }));
         slideshowTimeline.setCycleCount(Timeline.INDEFINITE);
         slideshowTimeline.play();
