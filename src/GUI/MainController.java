@@ -2,6 +2,8 @@ package GUI;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -46,15 +48,26 @@ public class MainController  {
 
         List<File> selectedFiles = fileChooser.showOpenMultipleDialog(null);
         if (selectedFiles != null && !selectedFiles.isEmpty()) {
-            for (File file : selectedFiles) {
-                Image image = new Image(file.toURI().toString());
-                images.add(image);
-                imagePlace.setImage(image);
-                String name= file.getName();
-                imgname.setText(name);
-            }
+            Task<Void> loadImageTask = new Task<Void>() {
+                @Override
+                protected Void call() throws Exception {
+                    for (File file : selectedFiles) {
+                        Image image = new Image(file.toURI().toString());
+                        images.add(image);
+                        Platform.runLater(() -> {
+                            imagePlace.setImage(image);
+                            String name = file.getName();
+                            imgname.setText(name);
+                        });
+                    }
+                    return null;
+                }
+            };
+
+            new Thread(loadImageTask).start();
         }
     }
+
 
 
     //When the button is clicked,swithes image for next loaded.
@@ -84,23 +97,32 @@ public class MainController  {
     }
 
     //Logic for starting the slideshow.
-    public void startSlideshow(){
+    public void startSlideshow() {
         if (images.isEmpty()) {
             errorNoImages("No images loaded for slideshow.");
             return;
         }
 
         stopSlideshow();
+        Task<Void> slideshowTask = new Task<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                slideshowTimeline = new Timeline(new KeyFrame(Duration.seconds(2), event -> {
+                    currentIndex = (currentIndex + 1) % images.size();
+                    Image nextImage = images.get(currentIndex);
+                    Platform.runLater(() -> {
+                        imagePlace.setImage(nextImage);
+                        String name = nextImage.getUrl().substring(nextImage.getUrl().lastIndexOf("/") + 1, nextImage.getUrl().length());
+                        imgname.setText(name);
+                    });
+                }));
+                slideshowTimeline.setCycleCount(Timeline.INDEFINITE);
+                slideshowTimeline.play();
+                return null;
+            }
+        };
 
-        slideshowTimeline = new Timeline(new KeyFrame(Duration.seconds(2), event -> {
-            currentIndex = (currentIndex + 1) % images.size();
-            Image nextImage = images.get(currentIndex);
-            imagePlace.setImage(nextImage);
-            String name=nextImage.getUrl().substring(nextImage.getUrl().lastIndexOf("/")+1, nextImage.getUrl().length());
-            imgname.setText(name);
-        }));
-        slideshowTimeline.setCycleCount(Timeline.INDEFINITE);
-        slideshowTimeline.play();
+        new Thread(slideshowTask).start();
     }
 
     public void stopSlideshow() {
