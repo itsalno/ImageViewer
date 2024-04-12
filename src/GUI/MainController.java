@@ -4,6 +4,7 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -15,7 +16,10 @@ import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
@@ -24,6 +28,10 @@ import java.util.Random;
 import java.util.ResourceBundle;
 
 public class MainController  {
+    public Label redPx;
+    public Label greenPx;
+    public Label bluePx;
+    public Label mixedPx;
     @FXML
     private ImageView imagePlace;
     @FXML
@@ -59,13 +67,17 @@ public class MainController  {
                             String name = file.getName();
                             imgname.setText(name);
                         });
+
+                        // Start a new thread to count pixels for each image
+                        Thread countPixelsThread = new Thread(() -> countPixels(file.getPath()));
+                        countPixelsThread.start();
                     }
                     return null;
                 }
             };
-
             new Thread(loadImageTask).start();
         }
+
     }
 
 
@@ -80,6 +92,9 @@ public class MainController  {
             imagePlace.setImage(nextImage);
             String name=nextImage.getUrl().substring(nextImage.getUrl().lastIndexOf("/")+1, nextImage.getUrl().length());
             imgname.setText(name);
+
+            new Thread(() -> countPixels(nextImage)).start();
+
         }
     }
 
@@ -93,6 +108,8 @@ public class MainController  {
             imagePlace.setImage(previousImage);
             String name=previousImage.getUrl().substring(previousImage.getUrl().lastIndexOf("/")+1, previousImage.getUrl().length());
             imgname.setText(name);
+
+            new Thread(() -> countPixels(previousImage)).start();
         }
     }
 
@@ -104,17 +121,22 @@ public class MainController  {
         }
 
         stopSlideshow();
+
         Task<Void> slideshowTask = new Task<Void>() {
             @Override
             protected Void call() throws Exception {
                 slideshowTimeline = new Timeline(new KeyFrame(Duration.seconds(2), event -> {
+                    // Increment currentIndex before accessing the image
                     currentIndex = (currentIndex + 1) % images.size();
                     Image nextImage = images.get(currentIndex);
                     Platform.runLater(() -> {
                         imagePlace.setImage(nextImage);
-                        String name = nextImage.getUrl().substring(nextImage.getUrl().lastIndexOf("/") + 1, nextImage.getUrl().length());
+                        String name = nextImage.getUrl().substring(nextImage.getUrl().lastIndexOf("/") + 1);
                         imgname.setText(name);
                     });
+
+                    // Count pixels for the current image
+                    countPixels(nextImage);
                 }));
                 slideshowTimeline.setCycleCount(Timeline.INDEFINITE);
                 slideshowTimeline.play();
@@ -125,12 +147,110 @@ public class MainController  {
         new Thread(slideshowTask).start();
     }
 
+    private void countPixels(Image image) {
+        Task<Void> countPixelsTask = new Task<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                try {
+                    BufferedImage bufferedImage = SwingFXUtils.fromFXImage(image, null);
+
+                    int redCount = 0;
+                    int greenCount = 0;
+                    int blueCount = 0;
+                    int mixedCount = 0;
+
+                    int width = bufferedImage.getWidth();
+                    int height = bufferedImage.getHeight();
+
+                    for (int y = 0; y < height; y++) {
+                        for (int x = 0; x < width; x++) {
+                            int rgb = bufferedImage.getRGB(x, y);
+                            int red = (rgb >> 16) & 0xFF;
+                            int green = (rgb >> 8) & 0xFF;
+                            int blue = rgb & 0xFF;
+
+                            if (red > green && red > blue) {
+                                redCount++;
+                            } else if (green > red && green > blue) {
+                                greenCount++;
+                            } else if (blue > red && blue > green) {
+                                blueCount++;
+                            } else {
+                                mixedCount++;
+                            }
+                        }
+                    }
+
+                    int finalRedCount = redCount;
+                    int finalGreenCount = greenCount;
+                    int finalBlueCount = blueCount;
+                    int finalMixedCount = mixedCount;
+
+                    Platform.runLater(() -> {
+                        redPx.setText(String.valueOf(finalRedCount) + " Px");
+                        greenPx.setText(String.valueOf(finalGreenCount) + " Px");
+                        bluePx.setText(String.valueOf(finalBlueCount) + " Px");
+                        mixedPx.setText(String.valueOf(finalMixedCount) + " Px");
+                    });
+                } catch (Exception e) {
+                    e.printStackTrace(); // Handle or log the exception appropriately
+                }
+                return null;
+            }
+        };
+        new Thread(countPixelsTask).start();
+    }
+
     public void stopSlideshow() {
         if (slideshowTimeline != null) {
             slideshowTimeline.stop();
             slideshowTimeline = null;
         }
     }
+public void countPixels(String imagePath) {
+    int redCount = 0;
+    int greenCount = 0;
+    int blueCount = 0;
+    int mixedCount=0;
+
+    try {
+        BufferedImage bufferedImage = ImageIO.read(new File(imagePath));
+
+        int width = bufferedImage.getWidth();
+        int height = bufferedImage.getHeight();
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                int rgb = bufferedImage.getRGB(x, y);
+                int red = (rgb >> 16) & 0xFF;
+                int green = (rgb >> 8) & 0xFF;
+                int blue = rgb & 0xFF;
+
+                if (red > green && red > blue) {
+                    redCount++;
+                } else if (green > red && green > blue) {
+                    greenCount++;
+                } else if (blue > red && blue > green) {
+                    blueCount++;
+                } else {
+                    mixedCount++;
+                }
+            }
+        }
+        int finalRedCount = redCount;
+        int finalGreenCount = greenCount;
+        int finalBlueCount = blueCount;
+        int finalMixedCount= mixedCount;
+        Platform.runLater(() -> {
+            redPx.setText(String.valueOf(finalRedCount) + " Px");
+            greenPx.setText(String.valueOf(finalGreenCount) + " Px");
+            bluePx.setText(String.valueOf(finalBlueCount) + " Px");
+            mixedPx.setText(String.valueOf(finalMixedCount)+" Px");
+        });
+    } catch (IOException e) {
+        throw new RuntimeException(e);
+    }
+}
 
     private void errorNoImages(String errorMessage) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
